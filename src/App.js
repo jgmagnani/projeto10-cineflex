@@ -1,24 +1,27 @@
-import logo from './logo.svg';
-import './App.css';
+import Top from "./components/Top";
+import Films from "./pages/Films";
+import GlobalStyle from "./css/GlobalStyle"
+import MovieTimes from "./pages/MovieTimes";
+import Seats from "./pages/Seats";
+import { Assentos } from "./components/Assentos";
+import { useState } from "react";
+import Sucess from "./pages/Sucess";
+
 
 function App() {
+  const [selectedSeats, setSelectedSeats] = useState([]);
+
+
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <GlobalStyle/>
+      <Top/>
+      {/* <Films/> */}
+      {/* <MovieTimes/> */}
+      {/* <Seats assentos={Assentos}/> */}
+      <Sucess/>
+    </>
   );
 }
 
