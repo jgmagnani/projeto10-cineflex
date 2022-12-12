@@ -90,6 +90,7 @@ const Session = styled.div`
 `
 
 const Home = styled.div`
+    width: 375px;
     display: flex;
     align-items: center;
     justify-content: center;
