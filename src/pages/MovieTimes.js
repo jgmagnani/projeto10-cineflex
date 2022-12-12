@@ -1,39 +1,50 @@
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { Link, useParams } from "react-router-dom"
 import styled from "styled-components"
 import Footer from "../components/Footer"
 
-export default function MovieTimes(){
-    return(
+
+export default function MovieTimes() {
+    const { idFilm } = useParams();
+    const [sessions, setSessions] = useState(undefined);
+
+
+    useEffect(() => {
+        const request = axios.get(
+            `https://mock-api.driven.com.br/api/v8/cineflex/movies/2/showtimes`
+        );
+        request.then((resposta) => {
+            setSessions(resposta.data);
+        });
+        request.catch((resposta) => console.log(resposta.data));
+    }, []);
+
+    if (sessions === undefined) {
+        return <p>loading...</p>;
+    }
+
+
+    return (
         <>
-            <TitlePage>            
+            <TitlePage>
                 <h2>Selecione o horário</h2>
             </TitlePage>
-            <Schedules>
-                <Schedule>
-                    <h3>Quinta-Feira - 24/12/2022</h3>
-                    <Hours>
-                        <button>
-                            15:00
-                        </button>
-                        <button>
-                            19:00
-                        </button>
-                    </Hours>
-                </Schedule>
-                
-                <Schedule>
-                    <h3>Sexta-Feira - 25/12/2022</h3>
-                    <Hours>
-                        <button>
-                            15:00
-                        </button>
-                        <button>
-                            19:00
-                        </button>
-                    </Hours>
-                </Schedule>
-            </Schedules>
 
-            <Footer/>
+            {sessions.days.map((session) => (
+                <Schedules key={session.id} data-test="movie-day">
+                    {session.weekday}
+                    <Schedule>
+                        {session.showtimes.map((time) => (
+                            <Link to={`/assentos/${time.id}`} key={time.id} data-test="showtime">
+                                <button >{time.name}</button>
+                            </Link>
+                        ))}
+                    </Schedule>
+                </Schedules>
+            ))}           
+
+            <Footer />
         </>
     )
 }
@@ -58,32 +69,18 @@ const TitlePage = styled.div`
     }
 
 `
-const  Schedules =  styled.div`
-    
-
+const Schedules = styled.div`
+    margin-left: 24px;
+    font-family: Roboto;
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 23px;
+    letter-spacing: 0.02em;
+    text-align: left;
 `
 const Schedule = styled.div`
     display: flex;
-    flex-direction: column;
-    margin-bottom: 23px;
-    margin-left: 24px;
-    h3{
-        height: 35px;
-        width: 241px;
-        left: 24px;
-        top: 170px;
-        border-radius: nullpx;
-    }
-
-
-`
-
-const Hours = styled.div`
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: start;
-    margin-right: 10px;
-    
+    margin-bottom: 30px;
     button {
         height: 43px;
         width: 83px;
@@ -96,5 +93,4 @@ const Hours = styled.div`
         margin-right: 10px;
         
     }
-
 `

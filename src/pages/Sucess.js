@@ -1,7 +1,12 @@
+import { Link } from "react-router-dom";
 import styled from "styled-components"
 
-export default function Sucess(){
-    return(
+export default function Sucess({ selectedSeats }) {
+    if (selectedSeats.seats === undefined) {
+        return <p>L O A D I N G ...</p>;
+    }
+
+    return (
         <>
             <TitlePage>
                 <h2>Pedido feito <br></br>
@@ -10,30 +15,34 @@ export default function Sucess(){
             </TitlePage>
 
             <SessionInfo>
-                <Session>
+                <Session data-test="movie-info">
                     <h1>Filme e sessão</h1>
-                    <h2>Enola Holmes</h2>
-                    <h2>24/12/2022</h2>
+                    <h2>{selectedSeats.title}</h2>
+                    <h2>{`${selectedSeats.date} ${selectedSeats.time}`}</h2>
                 </Session>
 
-                <Session>
+                <Session data-test="seats-info">
                     <h1>Ingressos</h1>
-                    <h2>Assento 15</h2>
-                    <h2>Assento 16</h2>
+                    <h2>
+                        {selectedSeats.seats.map((id) => (
+                        <p key={id}>{`assento ${id}`}</p>
+                    ))}
+                    </h2>
                 </Session>
 
-                <Session>
+                <Session data-test="client-info">
                     <h1>Comprador</h1>
-                    <h2>Enola Holmes</h2>
-                    <h2>24/12/2022</h2>
+                    <h2>{`Nome: ${selectedSeats.name}`}</h2>
+                    <h2>{`CPF: ${selectedSeats.cpf}`}</h2>
                 </Session>
 
             </SessionInfo>
+            <Link to="/" data-test="go-home-btn">
+                <Home>
+                    <button>Voltar para Home</button>
+                </Home>
+            </Link>
 
-            <Home>
-                <button>Voltar para Home</button>
-            </Home>
-        
         </>
 
     )
@@ -90,7 +99,7 @@ const Session = styled.div`
 `
 
 const Home = styled.div`
-    width: 375px;
+    width: 400px;
     display: flex;
     align-items: center;
     justify-content: center;

@@ -63,7 +63,7 @@ const TitlePage = styled.div`
 `
 
 const FilmList = styled.div`
-    width: 375px;
+    width: 400px;
     display: flex;
     flex-wrap: wrap;
     align-items: center;

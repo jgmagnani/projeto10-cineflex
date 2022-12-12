@@ -1,179 +1,326 @@
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 import Footer from "../components/Footer";
+import Seat from "./Seat";
 
 
-export default function Seats({ assentos }) {
+export default function Seats({ name, setName, cpf, setCpf, ids, setIds, setSelectedSeats }) {
     //console.log(assentos)
+    const { idSession } = useParams();
+    const [reserve, setReserve] = useState(undefined);
+    const [seatList, setSeatList] = useState([])
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const request = axios.get(
+            `https://mock-api.driven.com.br/api/v8/cineflex/showtimes/14/seats`
+        );
+        request.then((resposta) => {
+            setReserve(resposta.data);
+        });
+        request.catch((resposta) => console.log(resposta.data));
+    }, []);
+
+    if (reserve === undefined) {
+        return <p>loading...</p>;
+
+    }
+
+    function reservation(event) {
+        event.preventDefault();
+        const reserveDate = { ids, name, cpf };
+        console.log(reserveDate)
+        const url =
+            "https://mock-api.driven.com.br/api/v8/cineflex/seats/book-many";
+
+        const promise = axios.post(url, reserveDate);
+        //promise.then((res) => console.log(res.data));
+        // promise.then(()=> navigate("/sucesso"))
+        promise.then(postThen)
+        promise.catch((res) => console.log(res.response.data));
+
+
+    }
+
+    function postThen(res) {
+        setSelectedSeats({ title: reserve.movie.title, date: reserve.day.date, time: reserve.name, seats: seatList, name, cpf })
+        navigate("/sucesso")
+        setName("")
+        setCpf("")
+        setIds([])
+
+    }
+
     return (
-        <SeatPage>
-            <TitlePage>
-                <h2>Selecione o(s) assento(s)</h2>
-            </TitlePage>
+        <ScreenContainer>
+
+            <Title>Selecione o(s) assento(s)</Title>
 
             <SeatList>
-                {assentos.map((e) =>
-                    <Seat key={e.id}>
-                        <p>{e.name}</p>
-                    </Seat>
-                )}
+                {reserve.seats.map((seat) => (
+                    <Seat
+                        key={seat.id}
+                        name={seat.name}
+                        isAvailable={seat.isAvailable}
+                        SeatId={seat.id}
+                        ids={ids}
+                        setIds={setIds}
+                        seatList={seatList}
+                        setSeatList={setSeatList}
+                    />
+                ))}
             </SeatList>
 
-            <SeatColors>
-                <SeatGreen></SeatGreen>
+            <Comment>
+                <div>
+                    <Selected></Selected>
+                    <p>Selecionado</p>
+                </div>
+                <div>
+                    <Available></Available>
+                    <p>Disponível</p>
+                </div>
+                <div>
+                    <Unavailable></Unavailable>
+                    <p>Indisponível</p>
+                </div>
+            </Comment>
 
-                <SeatGrey></SeatGrey>
+            <ReservationFoms onSubmit={reservation}>
+                <label htmlFor="name">Nome do comprador:</label>
+                <input
+                    id="name"
+                    name="name"
+                    type="text"
+                    value={name}
+                    placeholder="Digite seu nome..."
+                    onChange={(e) => setName(e.target.value)}
+                    required
+                    data-test="client-name"
+                />
+                <label htmlFor="cpf">CPF do comprador:</label>
+                <input
+                    id="cpf"
+                    name="cpf"
+                    type="number"
+                    value={cpf}
+                    placeholder="Digite seu CPF..."
+                    onChange={(e) => setCpf(e.target.value)}
+                    required
+                    data-test="client-cpf"
+                />
 
-                <SeatYellow></SeatYellow>
-            </SeatColors>
-
-            <ColorDesc>
-                <p>Disponível</p>
-                <p>Selecionado</p>
-                <p>Indisponível</p>
-            </ColorDesc>
-
-            <Infos>
-                <h2>Nome do comprador:</h2>
-
-                <input type="text" placeholder="Digite seu nome"></input>
-
-                <h2>CPF do comprador:</h2>
-
-                <input type="number" placeholder="Digite seu CPF"></input>
-
-            </Infos>
+                <button data-test="book-seat-btn" type="submit">Reservar assento(s)</button>
+            </ReservationFoms>
 
             <Footer />
-        </SeatPage>
-    )
+        </ScreenContainer>
+    );
+
 }
 
-const SeatPage = styled.div`
-    width: 375px;
-    
-`
+const ScreenContainer = styled.div`
+  width: 400px;
+  min-width: 400px;
+  min-height: 100vh;
+  background-color: #e5e5e5;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  margin: 0px;
+  padding-top: 50px;
+  padding-bottom: 120px;
+`;
 
-const TitlePage = styled.div`
-    height: 110px;
-    width: 374px;
-    left: 0px;
-    top: 67px;
-    border-radius: nullpx;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    h2 {
-        font-family: Roboto;
-        font-size: 24px;
-        font-weight: 400;
-        line-height: 28px;
-        letter-spacing: 0.04em;
-        text-align: center;
+const Header = styled.header`
+  width: 400px;
+  min-width: 400px;
+  min-height: 50px;
+  background-color: #c3cfd9;
+  position: fixed;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Roboto";
+  font-weight: 400;
+  font-size: 34px;
+  color: #e8833a;
+  padding: 10px;
+  z-index: 1;
+`;
 
-    }
-    
-`
+const Title = styled.p`
+  height: 110px;
+  width: 400px;
+  min-width: 400px;
+  padding-top: 50px;
+  padding-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  font-family: "Roboto";
+  font-weight: 400;
+  font-size: 24px;
+  line-height: 28px;
+  letter-spacing: 0.04em;
+  color: #293845;
+`;
+
+
+const Poster = styled.div`
+  width: 64px;
+  height: 89px;
+  background: #ffffff;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 2px;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  img {
+    width: 48px;
+    height: 72px;
+  }
+`;
 
 const SeatList = styled.div`
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;    
-    margin-left: 24px;
-    margin-right: 24px;
-    gap: 6px;
-`
-
-const Seat = styled.div`
+  /* height: 280px; */
+  width: 400px;
+  display: flex;
+  flex-wrap: wrap;
+  padding: 10px;
+  text-align: center;
+  font-family: "Roboto";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 11px;
+  line-height: 13px;
+  color: #000000;
+  /* button {
+    width: 26px;
+    height: 26px;
+    background: #c3cfd9;
+    border: 1px solid #808f9d;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 26px;
-    width: 26px;
-    left: 24px;
-    top: 202px;
-    border-radius: 12px;
-    background: #c3cfd9;
-    border: 1px solid #808f9d;
-    p{
-        color: #FFFFFF;
-    }
+    margin: 6px;
+  } */
+`;
 
-`
-
-const SeatColors = styled.div`
+const Comment = styled.div`
+  width: 400px;
+  display: flex;
+  justify-content: space-around;
+  div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  p {
+    font-family: "Roboto";
+    font-style: normal;
+    font-weight: 400;
+    font-size: 13px;
+    line-height: 15px;
     display: flex;
     align-items: center;
-    justify-content: space-around;
-    margin-top: 20px;
-`
-const ColorDesc = styled.div`
+    letter-spacing: -0.013em;
+    color: #4e5a65;
+    margin-top: 5px;
+  }
+`;
+const Selected = styled.button`
+  width: 26px;
+  height: 26px;
+  background: #1aae9e;
+  border: 1px solid #0e7d71;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+const Available = styled.button`
+  width: 26px;
+  height: 26px;
+  background: #c3cfd9;
+  border: 1px solid #808f9d;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+const Unavailable = styled.button`
+  width: 26px;
+  height: 26px;
+  background: #fbe192;
+  border: 1px solid #f7c52b;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const ReservationFoms = styled.form`
+  width: 400px;
+  padding: 24px;
+  margin-top: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-decoration: none;
+  label {
+    font-family: "Roboto";
+    font-style: normal;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 21px;
     display: flex;
     align-items: center;
-    justify-content: space-around;
-    margin-top: 3px;
-`
-
-const SeatGreen = styled.div`
-    height: 25px;
-    width: 25px;
-    left: 78px;
-    top: 377px;
-    border-radius: 17px; 
-
-    background-color: #1aae9e ;
-`
-const SeatGrey = styled.div`
-    background-color: #c3cfd9 ;
-
-    height: 25px;
-    width: 25px;
-    left: 78px;
-    top: 377px;
-    border-radius: 17px;
-
-`
-
-const SeatYellow = styled.div`
-    height: 25px;
-    width: 25px;
-    left: 78px;
-    top: 377px;
-    border-radius: 17px;
-
-    background-color: #fbe192 ;
-`
-
-const Infos = styled.div`
-    margin-left: 24px;
-    margin-top: 40px;
-    margin-bottom: 135px;
-    h2{
-        height: 25px;
-        width: 327px;
-        left: 24px;
-        top: 472px;
-        font-family: Roboto;
-        font-size: 18px;
-        font-weight: 400;
-        line-height: 21px;
-        letter-spacing: 0em;
-        text-align: left;
-    }
-    input{
-        height: 51px;
-        width: 327px;
-        left: 24px;
-        top: 497px;
-        border-radius: 3px;
-        border: 1px solid #D4D4D4;
-        font-family: Roboto;
-        font-size: 18px;
-        font-style: italic;
-        font-weight: 400;
-        line-height: 21px;
-        letter-spacing: 0em;
-        text-align: left;
-        margin-bottom: 8px;
-
-    }
-`
+    color: #293845;
+    margin-top: 10px;
+  }
+  input {
+    width: 327px;
+    height: 51px;
+    background: #ffffff;
+    border: 2px solid #d5d5d5;
+    border-radius: 3px;
+    font-family: "Roboto";
+    font-style: italic;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 21px;
+    display: flex;
+    align-items: center;
+  }
+  a {
+    text-decoration: none;
+  }
+  button {
+    width: 225px;
+    height: 42px;
+    font-family: "Roboto";
+    font-style: normal;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 21px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    letter-spacing: 0.04em;
+    color: #ffffff;
+    background: #e8833a;
+    border-radius: 3px;
+    margin-top: 50px;
+    margin-left: 48px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+`;

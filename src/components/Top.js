@@ -2,7 +2,8 @@ import styled from "styled-components"
 
 export default function Top(){
     return (
-        <TopLogo>
+       
+       <TopLogo>
            <h1>CINEFLEX</h1>
         </TopLogo>
     )
@@ -10,7 +11,7 @@ export default function Top(){
 
 const TopLogo = styled.div`
     background: #C3CFD9;   
-    width: 375px;
+    width: 400px;
     height: 67px;
     display: flex;
     justify-content: center;

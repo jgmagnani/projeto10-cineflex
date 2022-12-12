@@ -3,7 +3,7 @@ import Imagem from "..//pages/image3.png"
 
 export default function Footer(){
     return(
-        <FooterAlign>
+        <FooterAlign data-test="footer">
             <MovieCover>
                 <img src={Imagem} />
             </MovieCover>
@@ -20,7 +20,7 @@ const FooterAlign = styled.div`
     bottom: 0;
     left: 0;
     height: 117px;
-    width: 375px;    
+    width: 400px;    
     border-radius: 0px;    
     border-top: 1px solid #b6c2cd;
     background-color: #dfe6ed;
