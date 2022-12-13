@@ -3,10 +3,9 @@ import Films from "./pages/Films";
 import GlobalStyle from "./css/GlobalStyle"
 import MovieTimes from "./pages/MovieTimes";
 import Seats from "./pages/Seats";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Sucess from "./pages/Sucess";
-import axios from "axios";
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 
 function App() {
@@ -20,9 +19,10 @@ function App() {
     <>
       <GlobalStyle />
       
-      <Top />
+      
       
       <BrowserRouter>
+        <Top />
         <Routes>
           <Route path="/" element={<Films />} />
           <Route path="/sessoes/:idFilme" element={<MovieTimes />} />

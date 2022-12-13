@@ -1,27 +1,31 @@
-import styled from "styled-components"
+import { Link, useNavigate } from "react-router-dom"
+import TopStyle from "../css/TopStyle";
 
-export default function Top(){
-    return (
-       
-       <TopLogo>
-           <h1>CINEFLEX</h1>
-        </TopLogo>
-    )
-}
+export default function Top() {
 
-const TopLogo = styled.div`
-    background: #C3CFD9;   
-    width: 400px;
-    height: 67px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    h1 {
-        font-family: Roboto;
-        font-size: 34px;
-        font-weight: 400;        
-        text-align: center;
-        color: #E8833A;
+    let local = window.location.href;
+    let navigate = useNavigate();
+
+    function handleClick() {
+        navigate(-1)
+    }
+    console.log(window.location.href)
+    
+    if (!local.includes("sessoes") && !local.includes("assentos") && !local.includes("sucesso")) {
+        return (
+            <TopStyle.TopLogo>           
+                <h1>CINEFLEX</h1>
+            </TopStyle.TopLogo>
+        )
     }
 
-`
+    return (
+
+        <TopStyle.TopLogo>
+            <a onClick={handleClick}>
+                <ion-icon name="arrow-back-outline"></ion-icon>
+            </a>
+            <h1>CINEFLEX</h1>
+        </TopStyle.TopLogo>
+    )
+}
